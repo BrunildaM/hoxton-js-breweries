@@ -1,7 +1,6 @@
-// Write your code here
 
 const baseUrl = 'https://api.openbrewerydb.org/breweries'
-const selectStateForm = document.querySelector("#select-state-form")
+const selectStateForm = document.querySelector('#select-state-form')
 const filterSectionEl = document.querySelector('.filters-section')
 
 
@@ -29,8 +28,6 @@ const filterSectionEl = document.querySelector('.filters-section')
 ]
 
 
- 
-
 
 let state = {
    selectedState: '',
@@ -51,6 +48,19 @@ let state = {
     return breweriesToDisplay
   }
 
+
+  function getCitiesFromBreweries(breweries: Array<Breweries>) {
+    //@ts-ignore
+    let cities = []
+
+    for (const brewery of breweries) {
+      
+      if (!cities.includes(brewery.city)){
+        cities.push(brewery.city)
+      }
+    }
+    return cities
+  }
 
   function readBreweries() {
     return fetch(baseUrl). then(resp => resp.json())
@@ -151,6 +161,11 @@ function renderBreweryList() {
     })
   }
 
-  listenToSelectStateForm()
 
-render()
+  function init() {
+    render()
+    listenToSelectStateForm()
+  }
+  
+  init()
+
