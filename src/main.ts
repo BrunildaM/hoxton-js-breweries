@@ -13,6 +13,9 @@ const breweryListWrapper = document.querySelector('.brewery-list-wrapper')
 
 const filterByType = document.querySelector('#filter-by-type')
 
+const searchInput = document.querySelector('#search-breweries')
+const searchForm = document.querySelector('#search-breweries-form')
+
 
  type Breweries = [
   {
@@ -44,7 +47,8 @@ let state = {
     breweries: [],
     breweryTypes: ['micro', 'regional', 'brewpub'],
     selectedBreweryType: '',
-    selectedCities: []
+    selectedCities: [],
+    search: ''
   }
 
 
@@ -134,6 +138,7 @@ let state = {
  }
     
   }
+
 
 
   function renderBreweryItem(brewery) {
@@ -231,6 +236,15 @@ for (const brewery of getBreweriesToDisplay()){
       state.selectedBreweryType = filterByType.value
 
       render()
+    })
+  }
+
+
+  function listenToSearchInput() {
+    searchForm?.addEventListener('submit', function(event){
+      event.preventDefault()
+
+      state.search = searchForm.search.value
     })
   }
 
