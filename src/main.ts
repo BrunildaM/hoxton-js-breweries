@@ -11,6 +11,9 @@ const searchBarEl = document.querySelector('.search-bar')
 const breweryListWrapper = document.querySelector('.brewery-list-wrapper')
 
 
+const filterByType = document.querySelector('#filter-by-type')
+
+
  type Breweries = [
   {
     address_2: null,
@@ -53,6 +56,13 @@ let state = {
         //@ts-ignore
         state.breweryTypes.includes(brewery.brewery_type)
     )
+
+    if (state.selectedCities.length > 0) {
+      breweriesToDisplay = breweriesToDisplay.filter(brewery =>
+        state.selectedCities.includes(brewery.city)
+        )
+    }
+
     breweriesToDisplay = breweriesToDisplay.slice(0, 10)
     return breweriesToDisplay
   }
@@ -84,58 +94,50 @@ let state = {
 
 
   function renderFilterSection() {
-    const asideEl = document.createElement('aside')
-    asideEl.className = "filters-section"
 
-    /*   <aside class="filters-section">
-        <h2>Filter By:</h2>
-        <!-- Type of brewery - Challenge #1 -->
-        <form id="filter-by-type-form" autocompete="off">
-          <label for="filter-by-type">
-            <h3>Type of Brewery</h3>
-          </label>
-          <select name="filter-by-type" id="filter-by-type">
-            <option value="">Select a type...</option>
-            <option value="micro">Micro</option>
-            <option value="regional">Regional</option>
-            <option value="brewpub">Brewpub</option>
-          </select>
-        </form>
-        <!-- Cities  - Challenge #2 -->
-        <div class="filter-by-city-heading">
-          <h3>Cities</h3><button class="clear-all-btn">clear all</button>
-        </div>
-        <form id="filter-by-city-form">
-          <input type="checkbox" name="williamsville" value="williamsville">
-          <label for="williamsville">Williamsville</label> <input type="checkbox" name="holland patent"
-            value="holland patent">
-          <label for="holland patent">Holland Patent</label>
-          <input type="checkbox" name="holbrook" value="holbrook">
-          <label for="more">More cities ...</label>
-          <input type="checkbox" name="more" value="more">
-        </form>*/
+    filterByType.value = state.selectedBreweryType
+
+    if (filterByCityForm === null) return
+
+ filterByCityForm.innerHTML = ''
+
+ const cities = getCitiesFromBreweries(state.breweries)
+
+ for (const city of cities){
+  const inputEl = document.createElement('input')
+  inputEl.setAttribute('type', 'checkbox')
+  inputEl.setAttribute('class', 'city-checkbox')
+  inputEl.setAttribute('name', city)
+  inputEl.setAttribute('value', city)
+  inputEl.setAttribute('id', city)
+
+  const labelEl = document.createElement('label')
+  labelEl.setAttribute('for', city)
+  labelEl.textContent = city
+
+  inputEl.addEventListener('change', function(){
+    const cityCheckboxes = document.querySelectorAll('.city-checkbox')
+    let selectedCities = []
+
+    for (const checkbox of cityCheckboxes) {
+      if (checkbox.checked) selectedCities.push(checkbox.value)
+    }
+
+    state.selectedCities = selectedCities
+
+    render()
+
+  })
+  
+
+  filterByCityForm.append(inputEl, labelEl)
+ }
     
   }
 
 
   function renderBreweryItem(brewery) {
-    /*<li>
-      <h2>Snow Belt Brew</h2>
-      <div class="type">micro</div>
-      <section class="address">
-        <h3>Address:</h3>
-        <p>9511 Kile Rd</p>
-        <p><strong>Chardon, 44024</strong></p>
-      </section>
-      <section class="phone">
-        <h3>Phone:</h3>
-        <p>N/A</p>
-      </section>
-      <section class="link">
-        <a href="null" target="_blank">Visit Website</a>
-      </section>
-    </li>
-    */
+  
 
    const liEl= document.createElement('li')
 
@@ -212,11 +214,23 @@ for (const brewery of getBreweriesToDisplay()){
         event.preventDefault()
         // @ts-ignore
        state.selectedState = selectStateForm['select-state'].value
+
         readBreweriesByState(state.selectedState)
         .then(function(breweries) {
             state.breweries = breweries
+            state.selectedCities = []
+            state.selectedBreweryType = ''
             render()
         })   
+    })
+  }
+
+
+  function listenToFilterByType() {
+    filterByType?.addEventListener('change', function(){
+      state.selectedBreweryType = filterByType.value
+
+      render()
     })
   }
 
@@ -224,5 +238,6 @@ for (const brewery of getBreweriesToDisplay()){
 
     render()
     listenToSelectStateForm()
+    listenToFilterByType()
 
 
